@@ -1,3 +1,5 @@
+import './globals.css'
+
 export const metadata = {
   title: "Inventory System",
   description: "Office items inventory",

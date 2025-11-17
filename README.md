@@ -35,3 +35,9 @@ kubectl logs deployment/postgres
 
 ลบ Docker image ที่อยู่ใน Kubernetes nodes
 docker image prune -a
+
+docker build -t inventory-frontend:latest ./frontend
+kubectl rollout restart deployment inventory-frontend
+kubectl port-forward svc/inventory-frontend 3000:3000
+
+docker system prune -a -f

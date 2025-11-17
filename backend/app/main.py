@@ -8,8 +8,8 @@ app = FastAPI(title="Inventory API")
 
 # CORS settings
 origins = [
-    "http://localhost:3000",  # frontend URL
-    "*",                      # หรือใส่ "*" เพื่ออนุญาตทุก origin (dev only)
+    "http://localhost:3000",
+    "*"   # DEV only — แนะนำให้เอาออกใน production
 ]
 
 app.add_middleware(
@@ -20,28 +20,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.on_event("startup")
 def on_startup():
     init_db()
+
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+
 @app.post("/items", response_model=Item)
 def create_item(item: ItemCreate):
     return crud.create_item(item)
 
-@app.get("/items")
+
+@app.get("/items", response_model=list[Item])   # ✅ ใส่ response_model ให้ชัด
 def read_items():
     return crud.list_items()
 
-@app.get("/items/{item_id}")
+
+@app.get("/items/{item_id}", response_model=Item)  # ✅ ใส่ response_model
 def read_item(item_id: int):
     item = crud.get_item(item_id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
     return item
+
 
 @app.put("/items/{item_id}", response_model=Item)
 def edit_item(item_id: int, item: ItemUpdate):
@@ -49,6 +55,7 @@ def edit_item(item_id: int, item: ItemUpdate):
     if not updated:
         raise HTTPException(status_code=404, detail="Item not found")
     return updated
+
 
 @app.delete("/items/{item_id}")
 def remove_item(item_id: int):
